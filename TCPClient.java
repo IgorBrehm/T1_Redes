@@ -5,22 +5,20 @@ import java.util.Scanner;
 class TCPClient {
 	public static void main(String args[]) throws Exception {
 	  	Scanner input = new Scanner (System.in);
+        ServerSocket welcomeSocket = new ServerSocket(6789);
+        String clientSentence;
 		String message;
 		String name;
 		System.out.println("Digite seu nome:");
         name = input.nextLine();
 		boolean flag = false;
 		while (flag == false) {
-			System.out.println("\nDigite seu lance:");
-			message = input.nextLine();
-			if (message.equals("sair")) {
-				flag = true;
-				break;
-			}
-			message = name + "-"+ message;
+            Socket connectionSocket = welcomeSocket.accept();
+			BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+			clientSentence = inFromClient.readLine();
+            
 			Socket clientSocket = new Socket("localhost", 6789);
 			DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-			System.out.println("Para fechar o programa, digite \'sair\'");
 			outToServer.writeBytes(message);
 			clientSocket.close();
 	    }
