@@ -4,12 +4,12 @@ import java.time.*;
 
 class TCPServer {
 	public static void main(String args[]) throws Exception {
-		String clientSentence;
-        String[] players = new String[2];
-        players[0] = "";
-        players[1] = "";
-        int[] scores = new int[]{0,0};
-        int count = 0;
+		String clientSentence; // String usada para as mensagens enviadas pelo cliente
+        String[] players = new String[2]; // lista de nomes dos jogadores
+        players[0] = ""; // nome do jogador 1
+        players[1] = ""; // nome do jogador 2
+        int[] scores = new int[]{0,0}; // indice no tabuleiro onde esta cada jogador
+        int count = 0; // numero de jogadores jogando no momento
 		ServerSocket serverSocket = new ServerSocket(6789);
         Socket connectionSocket = serverSocket.accept();
         BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
@@ -22,26 +22,31 @@ class TCPServer {
             if(data[0].equals("Name")){
                 if(data[1].equals("")){
                     outToClient.writeBytes("Nome invalido");
+                    outToClient.flush();
                 }
                 else{
                     players[count] = data[1];
                     if(count == 0){
                         outToClient.writeBytes("Aguardando segundo jogador");
+                        outToClient.flush();
                         count = count + 1;
                     }
                     else{
                         outToClient.writeBytes("Iniciando jogo");
+                        outToClient.flush();
                     }
                 }
             }
             else{
                 outToClient.writeBytes("Envie seu nome primeiro");
+                outToClient.flush();
             }
             outSocket.close();
         }
         count = 0;
         while(count < 3){
             clientSentence = inFromClient.readLine();
+            System.out.println(clientSentence);
             // TODO execucao das rodadas
             count = count +1;
         }
