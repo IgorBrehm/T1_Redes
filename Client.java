@@ -26,6 +26,7 @@ public class Client {
         boolean flag = false;
         while (flag == false) {
             serverSentence = in.readUTF();
+            System.out.println(serverSentence);
             if(serverSentence.equals("Iniciando jogo")){
                 flag = true;
             }
