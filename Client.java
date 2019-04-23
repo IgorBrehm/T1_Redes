@@ -1,9 +1,11 @@
 import java.net.*;
 import java.io.*;
 import java.util.Scanner;
-
+import java.util.Random;
 public class Client {
    public static void main(String [] args) {
+      Random r = new Random();
+
       String serverName = args[0];
       int port = Integer.parseInt(args[1]);
       try {
@@ -15,7 +17,7 @@ public class Client {
         InputStream inFromServer = client.getInputStream();
         DataInputStream in = new DataInputStream(inFromServer);
          
-        Scanner input = new Scanner (System.in);
+        Scanner input = new Scanner(System.in);
         String serverSentence;
         String name;
         
@@ -49,10 +51,21 @@ public class Client {
         }
         flag = false;
         while(flag == false){
-            System.out.println("Digite um numero:");
-            String test = input.nextLine();
-            out.writeUTF(test);
-            // TODO execucao das rodadas
+            System.out.println("Digite 1 para jogar o dado:");
+            int res = input.nextInt();
+            int roll = r.nextInt(2) + 1;
+            out.writeUTF("Roll-"+roll);
+            serverSentence = in.readUTF();
+            if(serverSentence.equals("Esperando o adversario jogar")){
+                System.out.println(serverSentence);
+                while(true){
+                    serverSentence = in.readUTF();
+                    if(serverSentence.equals("Sua vez")){
+                        System.out.println(serverSentence);
+                        break;
+                    }
+                }            
+            }
         }
         client.close();
         input.close();
