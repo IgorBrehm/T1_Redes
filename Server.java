@@ -67,39 +67,57 @@ public class Server extends Thread {
             }
             out.writeUTF("Iniciando jogo");
             out2.writeUTF("Iniciando jogo");
+            int roll = 0;
             while(end_game == false){
                 out.writeUTF("Sua vez");
+                out2.writeUTF("Esperando o adversario jogar");
                 clientSentence = in.readUTF();
                 String[] data = clientSentence.split("-", 2);
-                int roll = Integer.parseInt(data[1]);
                 if(data[0].equals("Roll")){
+                    roll = Integer.parseInt(data[1]);
                     if(roll == 1){
                         scores[0] = scores[0] + 2;
+                        out2.writeUTF("Adversario avancou 2 casas!");
                     }
                     else{
                         scores[0] = scores[0] + 1;
+                        out2.writeUTF("Adversario avancou 1 casa!");
                     }
                 }
                 out.writeUTF("Esperando o adversario jogar");
                 out2.writeUTF("Sua vez");
                 clientSentence = in2.readUTF();
                 data = clientSentence.split("-", 2);
-                roll = Integer.parseInt(data[1]);
                 if(data[0].equals("Roll")){
+                    roll = Integer.parseInt(data[1]);
                     if(roll == 1){
                         scores[1] = scores[1] + 2;
+                        out.writeUTF("Adversario avancou 2 casas!");
                     }
                     else{
                         scores[1] = scores[1] + 1;
+                        out.writeUTF("Adversario avancou 1 casa!");
                     }
                 }
                 if(scores[0] >= 10 || scores[1] >= 10){
                     end_game = true;
+                    if(scores[0] >= 10){
+                        System.out.println("Jogador "+players[0]+" venceu a corrida!");
+                        out.writeUTF("Jogador "+players[0]+" venceu a corrida!");
+                        out2.writeUTF("Jogador "+players[0]+" venceu a corrida!");
+                        out.writeUTF("Fim de jogo");
+                        out2.writeUTF("Fim de jogo");
+                    }
+                    else{
+                        System.out.println("Jogador "+players[1]+" venceu a corrida!");
+                        out.writeUTF("Jogador "+players[1]+" venceu a corrida!");
+                        out2.writeUTF("Jogador "+players[1]+" venceu a corrida!");
+                        out.writeUTF("Fim de jogo");
+                        out2.writeUTF("Fim de jogo");
+                    }
                     break;
                 }
-                out2.writeUTF("Esperando o adversario jogar");
             }
-            System.out.println("WE DONE!");
             server1.close();
             server2.close();
          } catch (IOException e) {

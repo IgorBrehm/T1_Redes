@@ -51,8 +51,11 @@ public class Client {
         }
         flag = false;
         while(flag == false){
-            System.out.println("Digite 1 para jogar o dado:");
+            System.out.println("Digite 1 para jogar o dado, 2 para sair:");
             int res = input.nextInt();
+            if(res == 2){
+                break;   
+            }
             int roll = r.nextInt(2) + 1;
             out.writeUTF("Roll-"+roll);
             serverSentence = in.readUTF();
@@ -65,6 +68,9 @@ public class Client {
                         break;
                     }
                 }            
+            }
+            if(serverSentence.equals("Fim de jogo"){
+                break;   
             }
         }
         client.close();
