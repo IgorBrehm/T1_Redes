@@ -69,7 +69,7 @@ public class Client {
                     }
                 }            
             }
-            if(serverSentence.equals("Fim de jogo"){
+            if(serverSentence.equals("Fim de jogo")){
                 break;   
             }
         }
