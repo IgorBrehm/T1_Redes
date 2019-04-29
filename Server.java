@@ -27,10 +27,10 @@ public class Server extends Thread {
 
             for(int i = 0; i < board.length; i++){
                 if(i % 2 == 0){
-                    board[i] = 1;
+                    board[i] = 1; //posicao onde nada acontece
                 }
                 else{
-                    board[i] = 2;
+                    board[i] = 2; //posicao onde volta uma casa ou anda uma casa extra
                 }
             }
             
@@ -75,13 +75,22 @@ public class Server extends Thread {
                 String[] data = clientSentence.split("-", 2);
                 if(data[0].equals("Roll")){
                     roll = Integer.parseInt(data[1]);
-                    if(roll == 1){
+                    System.out.println("Jogador "+players[0]+" tirou "+roll+" nos dados!");
+                    if(roll <= 3){
                         scores[0] = scores[0] + 2;
                         out2.writeUTF("Adversario avancou 2 casas!");
+                        if(board[scores[0]] == 2){ // posicao de surpresa
+                            //Pegar um random pra decidir se ganha ou perde uma posicao
+                            //escreve na tela o que aconteceu
+                        }
                     }
                     else{
                         scores[0] = scores[0] + 1;
                         out2.writeUTF("Adversario avancou 1 casa!");
+                        if(board[scores[0]] == 2){ // posicao de surpresa
+                            //Pegar um random pra decidir se ganha ou perde uma posicao
+                            //escreve na tela o que aconteceu
+                        }
                     }
                 }
                 out.writeUTF("Esperando o adversario jogar");
@@ -90,13 +99,22 @@ public class Server extends Thread {
                 data = clientSentence.split("-", 2);
                 if(data[0].equals("Roll")){
                     roll = Integer.parseInt(data[1]);
-                    if(roll == 1){
+                    System.out.println("Jogador "+players[1]+" tirou "+roll+" nos dados!");
+                    if(roll <= 3){
                         scores[1] = scores[1] + 2;
                         out.writeUTF("Adversario avancou 2 casas!");
+                        if(board[scores[1]] == 2){ // posicao de surpresa
+                            //Pegar um random pra decidir se ganha ou perde uma posicao
+                            //escreve na tela o que aconteceu
+                        }
                     }
                     else{
                         scores[1] = scores[1] + 1;
                         out.writeUTF("Adversario avancou 1 casa!");
+                        if(board[scores[1]] == 2){ // posicao de surpresa
+                            //Pegar um random pra decidir se ganha ou perde uma posicao
+                            //escreve na tela o que aconteceu
+                        }
                     }
                 }
                 if(scores[0] >= 10 || scores[1] >= 10){
