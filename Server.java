@@ -10,6 +10,8 @@ import java.util.Random;
 
 public class Server extends Thread {
     private ServerSocket serverSocket;
+    private int[] scores;
+    private int[] board;
 
     public Server(int port) throws IOException {
         serverSocket = new ServerSocket(port);
@@ -25,8 +27,8 @@ public class Server extends Thread {
             String[] players = new String[2]; // lista de nomes dos jogadores
             players[0] = ""; // nome do jogador 1
             players[1] = ""; // nome do jogador 2
-            int[] scores = new int[]{0,0}; // indice no tabuleiro onde esta cada jogador
-            int[] board = new int[10];
+            scores = new int[]{0,0}; // indice no tabuleiro onde esta cada jogador
+            board = new int[10];
             
             DataInputStream in = new DataInputStream(server1.getInputStream());
             DataOutputStream out = new DataOutputStream(server1.getOutputStream());
@@ -104,65 +106,8 @@ public class Server extends Thread {
                         out2.writeUTF("Jogador "+players[0]+" venceu a corrida!");
                         break;
                     }
-                    switch(board[scores[0]]) {
-                        case 0: 
-                            break;
-                        case 1:
-                            out.writeUTF("Voce passou sobre oleo, e ira voltar duas casas");
-                            if (scores[0] >= 2) {
-                                scores[0] -= 2;
-                            }
-                            else scores[0] = 0;
+                    switchCasos(board[scores[0]], out, out2);
 
-                            out2.writeUTF("Voce deu sorte, seu adversario passou sobre oleo e retornou duas casas");
-                            break;
-
-                        case 2:
-                            out.writeUTF("Voce derrapou na curva e ira voltar uma casa");
-                            if (scores[0] >= 1) {
-                                scores[0] -= 1;
-                            }
-                            else scores[0] = 0;
-                            out2.writeUTF("Seu adversario errou a curva e retornou uma casa");
-                            break;
-
-                        case 3:
-                            out.writeUTF("Voce acabou de passar por um turbo, e ira andar mais duas casas");
-                            scores[0] += 2;
-
-                            out2.writeUTF("Seu adversario pegou um turbo e acelerou mais duas casas a frente");
-                            break;
-
-                        case 4:
-                            out.writeUTF("Voce acabou de passar por um buraco, e ira retornar mais duas casas");
-                            if (scores[0] >= 2) {
-                                scores[0] -= 2;
-                            }
-                            else scores[0] = 0;
-
-                            out2.writeUTF("Seu adversario passou por um buraco e voltou duas casas");
-                            break;
-
-                        case 5:
-                            out.writeUTF("Voce acabou de realizar uma curva perfeita, e ira andar mais uma casa");
-                            scores[0] += 1;
-
-                            out2.writeUTF("Seu adversario se deu bem na curva, e andou mais uma casa");
-                            break;
-                            
-                        case 6:
-                            int muitaSorte = r.nextInt(2);
-                            if (muitaSorte == 1) {
-                                out.writeUTF("Uau, que habilidade!!! Voce encontrou um atalho e ira pular 4 casas");
-                                scores[0] += 4;
-
-                                out2.writeUTF("De repente seu adversario pulou 4 casas, que loucura!!!");
-                                break;
-                            }
-                            else break;
-                        default:
-                            break;
-                    }
                 }
                 else{
                     System.out.println(clientSentence);
@@ -185,65 +130,8 @@ public class Server extends Thread {
                         out2.writeUTF("Jogador "+players[1]+" venceu a corrida!");
                         break;
                     }
-                    switch(board[scores[1]]) {
-                        case 0: 
-                            break;
-                        case 1:
-                            out2.writeUTF("Voce passou sobre oleo, e ira voltar duas casas");
-                            if (scores[1] >= 2) {
-                                scores[1] -= 2;
-                            }
-                            else scores[1] = 0;
 
-                            out.writeUTF("Voce deu sorte, seu adversario passou sobre oleo e retornou duas casas");
-                            break;
-
-                        case 2:
-                            out2.writeUTF("Voce derrapou na curva e ira voltar uma casa");
-                            if (scores[1] >= 1) {
-                                scores[1] -= 1;
-                            }
-                            else scores[1] = 0;
-                            out.writeUTF("Seu adversario errou a curva e retornou uma casa");
-                            break;
-
-                        case 3:
-                            out2.writeUTF("Voce acabou de passar por um turbo, e ira andar mais duas casas");
-                            scores[1] += 2;
-
-                            out.writeUTF("Seu adversario pegou um turbo e acelerou mais duas casas a frente");
-                            break;
-
-                        case 4:
-                            out2.writeUTF("Voce acabou de passar por um buraco, e ira retornar mais duas casas");
-                            if (scores[1] >= 2) {
-                                scores[1] -= 2;
-                            }
-                            else scores[1] = 0;
-
-                            out.writeUTF("Seu adversario passou por um buraco e voltou duas casas");
-                            break;
-
-                        case 5:
-                            out2.writeUTF("Voce acabou de realizar uma curva perfeita, e ira andar mais uma casa");
-                            scores[1] += 1;
-
-                            out.writeUTF("Seu adversario se deu bem na curva, e andou mais uma casa");
-                            break;
-                            
-                        case 6:
-                            int muitaSorte = r.nextInt(2);
-                            if (muitaSorte == 1) {
-                                out2.writeUTF("Uau, que habilidade!!! Voce encontrou um atalho e ira pular 4 casas");
-                                scores[1] += 4;
-
-                                out.writeUTF("De repente seu adversario pulou 4 casas, que loucura!!!");
-                                break;
-                            }
-                            else break;
-                        default:
-                            break;
-                    }
+                    switchCasos(board[scores[1]], out2, out);
                 }
                 else{
                     System.out.println(clientSentence);
@@ -254,6 +142,74 @@ public class Server extends Thread {
             e.printStackTrace();
         }
     }
+
+    public void switchCasos(int board_score, DataOutputStream jogador1, DataOutputStream jogador2){
+        Random r = new Random();
+        try {
+            switch(board_score) {
+                case 0: 
+                    break;
+                case 1:
+                    jogador1.writeUTF("Voce passou sobre oleo, e ira voltar duas casas");
+                    if (scores[0] >= 2) {
+                        scores[0] -= 2;
+                    }
+                    else scores[0] = 0;
+
+                    jogador2.writeUTF("Voce deu sorte, seu adversario passou sobre oleo e retornou duas casa");
+                    break;
+
+                case 2:
+                    jogador1.writeUTF("Voce derrapou na curva e ira voltar uma casa");
+                    if (scores[0] >= 1) {
+                        scores[0] -= 1;
+                    }
+                    else scores[0] = 0;
+                    jogador2.writeUTF("Seu adversario errou a curva e retornou uma casa");
+                    break;
+
+                case 3:
+                    jogador1.writeUTF("Voce acabou de passar por um turbo, e ira andar mais duas casas");
+                    scores[0] += 2;
+
+                    jogador2.writeUTF("Seu adversario pegou um turbo e acelerou mais duas casas a frente");
+                    break;
+
+                case 4:
+                    jogador1.writeUTF("Voce acabou de passar por um buraco, e ira retornar mais duas casas");
+                    if (scores[0] >= 2) {
+                        scores[0] -= 2;
+                    }
+                    else scores[0] = 0;
+
+                    jogador2.writeUTF("Seu adversario passou por um buraco e voltou duas casas");
+                    break;
+
+                case 5:
+                    jogador1.writeUTF("Voce acabou de realizar uma curva perfeita, e ira andar mais uma casa");
+                    scores[0] += 1;
+
+                    jogador2.writeUTF("Seu adversario se deu bem na curva, e andou mais uma casa");
+                    break;
+                    
+                case 6:
+                    int muitaSorte = r.nextInt(2);
+                    if (muitaSorte == 1) {
+                        jogador1.writeUTF("Uau, que habilidade!!! Voce encontrou um atalho e ira pular 4 casas");
+                        scores[0] += 4;
+
+                        jogador2.writeUTF("De repente seu adversario pulou 4 casas, que loucura!!!");
+                        break;
+                    }
+                    else break;
+
+                default:
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+         }
+   }
     
     // Metodo main que inicia o programa servidor
     public static void main(String [] args) {
