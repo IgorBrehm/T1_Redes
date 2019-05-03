@@ -63,8 +63,11 @@ public class Client {
                         }
                     }            
                 }
-                if(serverSentence.equals("Fim de jogo")){
+                else if(serverSentence.equals("Fim de jogo")){
                     break;   
+                }
+                else {
+                    System.out.println(serverSentence);
                 }
                 System.out.println("Digite 1 para jogar o dado, 2 para sair:");
                 int res = input.nextInt();
