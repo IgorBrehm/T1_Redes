@@ -75,7 +75,7 @@ public class Client {
                     serverSentence = in.readUTF();
                     if(serverSentence.equals("Sua vez")){
                         System.out.println("\n"+serverSentence);
-                        System.out.println("Digite 1 para jogar o dado, 2 para sair:");
+                        System.out.println("\nDigite 1 para jogar o dado, 2 para sair:");
                         res = input.nextInt();
                         if(res == 2){
                             out.writeUTF("Exit-"+name);
@@ -83,7 +83,7 @@ public class Client {
                             break;   
                         }
                         roll = r.nextInt(5) + 1;
-                        System.out.println("Avancou " + roll + " casas!");
+                        System.out.println("\nAvancou " + roll + " casas!\n");
                         out.writeUTF("Roll-"+roll);
                         break;
                     }
@@ -100,14 +100,14 @@ public class Client {
             }
             else if(serverSentence.equals("Sua vez")){
                 System.out.println("\n"+serverSentence);
-                System.out.println("Digite 1 para jogar o dado, 2 para sair:");
+                System.out.println("\nDigite 1 para jogar o dado, 2 para sair:");
                 res = input.nextInt();
                 if(res == 2){
                     out.writeUTF("Exit-"+name);
                     break;   
                 }
                 roll = r.nextInt(5) + 1;
-                System.out.println("Avancou " + roll + " casas!");
+                System.out.println("\nAvancou " + roll + " casas!\n");
                 out.writeUTF("Roll-"+roll);
             }
             else if(serverSentence.equals("Fim de jogo")){

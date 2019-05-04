@@ -108,6 +108,18 @@ public class Server extends Thread {
                     }
                     switchCasos(board[scores[0]], out, out2);
 
+                    out.writeUTF("-------------------------------");
+                    out.writeUTF("Voce esta na casa: " + scores[0] );
+                    out.writeUTF("-------------------------------");
+                    out.writeUTF("Seu adversario esta na casa: " + scores[1] );
+                    out.writeUTF("-------------------------------");
+
+                    out2.writeUTF("-------------------------------");
+                    out2.writeUTF("Voce esta na casa: " + scores[1] );
+                    out2.writeUTF("-------------------------------");
+                    out2.writeUTF("Seu adversario esta na casa: " + scores[0] );
+                    out2.writeUTF("-------------------------------");
+
                 }
                 else{
                     System.out.println(clientSentence);
@@ -130,8 +142,22 @@ public class Server extends Thread {
                         out2.writeUTF("Jogador "+players[1]+" venceu a corrida!");
                         break;
                     }
-
                     switchCasos(board[scores[1]], out2, out);
+
+                    out2.writeUTF("-------------------------------");
+                    out2.writeUTF("Voce esta na casa: " + scores[1] );
+                    out2.writeUTF("-------------------------------");
+                    out2.writeUTF("Seu adversario esta na casa: " + scores[1] );
+                    out2.writeUTF("-------------------------------");
+
+                    out.writeUTF("-------------------------------");
+                    out.writeUTF("Voce esta na casa: " + scores[1] );
+                    out.writeUTF("-------------------------------");
+                    out.writeUTF("Seu adversario esta na casa: " + scores[0] );
+                    out.writeUTF("-------------------------------");
+
+
+
                 }
                 else{
                     System.out.println(clientSentence);
