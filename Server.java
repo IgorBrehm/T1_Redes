@@ -25,12 +25,15 @@ public class Server extends Thread {
             int roll = 0;
             boolean end_game = false;
             String clientSentence = "";
+
             while(end_game == false){
+                // Vez do jogador identificado por out e in
                 out.writeUTF("Sua vez");
                 out2.writeUTF("Aguardando adversario");
                 clientSentence = in.readUTF();
-                String[] data = clientSentence.split("-", 2);
+                String[] data = clientSentence.split("-", 2); // Pega a mensagem enviada pelo jogador
                 if(data[0].equals("Roll")){
+                    // Se o jogador rodou o dado deve apresentar o resultado para ambos jogadores e verificar se ele terminou a corrida
                     roll = Integer.parseInt(data[1]);
                     System.out.println("Jogador "+players[0]+" tirou "+roll+" nos dados!");
                     scores[0] = scores[0] + roll;
@@ -44,7 +47,7 @@ public class Server extends Thread {
                         out2.writeUTF("Jogador "+players[0]+" venceu a corrida!");
                         break;
                     }
-                    switchCasos(1,board[scores[0]], out, out2);
+                    switchCasos(1,board[scores[0]], out, out2); // Metodo que verifica o evento decorrente da casa onde o jogador parou
 
                     out.writeUTF("-------------------------------");
                     out.writeUTF("Voce esta na casa: " + scores[0] );
@@ -59,8 +62,8 @@ public class Server extends Thread {
                     out2.writeUTF("-------------------------------");
 
                 }
-                else if(data[0].equals("Exit")){
-                    out2.writeUTF("Desistencia");
+                else if(data[0].equals("Exit")){ // Verifica se o jogador desistiu do jogo
+                    out2.writeUTF("Desistencia"); // Avisa o outro jogador da desistencia de seu adversario
                     System.out.println("Jogador "+data[1]+" desistiu da partida.");
                     System.out.println("Esperando proximos jogadores");
                     return;
@@ -68,10 +71,11 @@ public class Server extends Thread {
                 else{
                     System.out.println(clientSentence);
                 }
+                // Vez do outro jogador, identificado por out2 e in2
                 out.writeUTF("Aguardando adversario");
                 out2.writeUTF("Sua vez");
                 clientSentence = in2.readUTF();
-                data = clientSentence.split("-", 2);
+                data = clientSentence.split("-", 2); 
                 if(data[0].equals("Roll")){
                     roll = Integer.parseInt(data[1]);
                     System.out.println("Jogador "+players[1]+" tirou "+roll+" nos dados!");
