@@ -17,6 +17,105 @@ public class Server extends Thread {
         serverSocket = new ServerSocket(port);
     }
 
+    public void rodadas(String[] players,DataInputStream in, DataInputStream in2, DataOutputStream out, DataOutputStream out2){
+        try{
+            int roll = 0;
+            boolean end_game = false;
+            String clientSentence = "";
+            while(end_game == false){
+                out.writeUTF("Sua vez");
+                out2.writeUTF("Aguardando adversario");
+                clientSentence = in.readUTF();
+                String[] data = clientSentence.split("-", 2);
+                if(data[0].equals("Roll")){
+                    roll = Integer.parseInt(data[1]);
+                    System.out.println("Jogador "+players[0]+" tirou "+roll+" nos dados!");
+                    scores[0] = scores[0] + roll;
+                    out2.writeUTF("Adversario avancou " + roll + " casas!");
+                    if(scores[0] >= 10){
+                        end_game = true;
+                        System.out.println("Jogador "+players[0]+" venceu a corrida!");
+                        out.writeUTF("Fim de jogo");
+                        out2.writeUTF("Fim de jogo");
+                        out.writeUTF("Jogador "+players[0]+" venceu a corrida!");
+                        out2.writeUTF("Jogador "+players[0]+" venceu a corrida!");
+                        break;
+                    }
+                    switchCasos(board[scores[0]], out, out2);
+
+                    out.writeUTF("-------------------------------");
+                    out.writeUTF("Voce esta na casa: " + scores[0] );
+                    out.writeUTF("-------------------------------");
+                    out.writeUTF("Seu adversario esta na casa: " + scores[1] );
+                    out.writeUTF("-------------------------------");
+
+                    out2.writeUTF("-------------------------------");
+                    out2.writeUTF("Voce esta na casa: " + scores[1] );
+                    out2.writeUTF("-------------------------------");
+                    out2.writeUTF("Seu adversario esta na casa: " + scores[0] );
+                    out2.writeUTF("-------------------------------");
+
+                }
+                else if(data[0].equals("Exit")){
+                    out2.writeUTF("Desistencia");
+                    System.out.println("Esperando próximos jogadores");
+                    run();
+                    return;
+                }
+                else{
+                    System.out.println(clientSentence);
+                }
+                out.writeUTF("Aguardando adversario");
+                out2.writeUTF("Sua vez");
+                clientSentence = in2.readUTF();
+                data = clientSentence.split("-", 2);
+                if(data[0].equals("Roll")){
+                    roll = Integer.parseInt(data[1]);
+                    System.out.println("Jogador "+players[1]+" tirou "+roll+" nos dados!");
+                    scores[1] = scores[1] + roll;
+                    out.writeUTF("Adversario avancou " + roll + " casas!");
+                    if(scores[1] >= 10){
+                        end_game = true;
+                        System.out.println("Jogador "+players[1]+" venceu a corrida!");
+                        out.writeUTF("Fim de jogo");
+                        out2.writeUTF("Fim de jogo");
+                        out.writeUTF("Jogador "+players[1]+" venceu a corrida!");
+                        out2.writeUTF("Jogador "+players[1]+" venceu a corrida!");
+                        break;
+                    }
+                    switchCasos(board[scores[1]], out2, out);
+
+                    out2.writeUTF("-------------------------------");
+                    out2.writeUTF("Voce esta na casa: " + scores[1] );
+                    out2.writeUTF("-------------------------------");
+                    out2.writeUTF("Seu adversario esta na casa: " + scores[1] );
+                    out2.writeUTF("-------------------------------");
+
+                    out.writeUTF("-------------------------------");
+                    out.writeUTF("Voce esta na casa: " + scores[1] );
+                    out.writeUTF("-------------------------------");
+                    out.writeUTF("Seu adversario esta na casa: " + scores[0] );
+                    out.writeUTF("-------------------------------");
+
+
+
+                }
+                else if(data[0].equals("Exit")){
+                    out.writeUTF("Desistencia");
+                    System.out.println("Esperando próximos jogadores.");
+                    run();
+                    return;
+                }
+                else{
+                    System.out.println(clientSentence);
+                }
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void run() {
         try {
             Random r = new Random();
@@ -70,7 +169,7 @@ public class Server extends Thread {
                 clientSentence = in2.readUTF();
                 String[] data = clientSentence.split("-", 2);
                 if(data[0].equals("Name")){
-                    if(data[1].equals("") || data[1].length() < 3){
+                    if(data[1].equals("") || data[1].length() < 3 || data[1].equals(players[0])){
                         out2.writeUTF("Nome invalido");
                     }
                     else{
@@ -85,84 +184,7 @@ public class Server extends Thread {
             //executando as rodadas
             out.writeUTF("Iniciando jogo");
             out2.writeUTF("Iniciando jogo");
-            int roll = 0;
-            boolean end_game = false;
-            while(end_game == false){
-                out.writeUTF("Sua vez");
-                out2.writeUTF("Aguardando adversario");
-                clientSentence = in.readUTF();
-                String[] data = clientSentence.split("-", 2);
-                if(data[0].equals("Roll")){
-                    roll = Integer.parseInt(data[1]);
-                    System.out.println("Jogador "+players[0]+" tirou "+roll+" nos dados!");
-                    scores[0] = scores[0] + roll;
-                    out2.writeUTF("Adversario avancou " + roll + " casas!");
-                    if(scores[0] >= 10){
-                        end_game = true;
-                        System.out.println("Jogador "+players[0]+" venceu a corrida!");
-                        out.writeUTF("Fim de jogo");
-                        out2.writeUTF("Fim de jogo");
-                        out.writeUTF("Jogador "+players[0]+" venceu a corrida!");
-                        out2.writeUTF("Jogador "+players[0]+" venceu a corrida!");
-                        break;
-                    }
-                    switchCasos(board[scores[0]], out, out2);
-
-                    out.writeUTF("-------------------------------");
-                    out.writeUTF("Voce esta na casa: " + scores[0] );
-                    out.writeUTF("-------------------------------");
-                    out.writeUTF("Seu adversario esta na casa: " + scores[1] );
-                    out.writeUTF("-------------------------------");
-
-                    out2.writeUTF("-------------------------------");
-                    out2.writeUTF("Voce esta na casa: " + scores[1] );
-                    out2.writeUTF("-------------------------------");
-                    out2.writeUTF("Seu adversario esta na casa: " + scores[0] );
-                    out2.writeUTF("-------------------------------");
-
-                }
-                else{
-                    System.out.println(clientSentence);
-                }
-                out.writeUTF("Aguardando adversario");
-                out2.writeUTF("Sua vez");
-                clientSentence = in2.readUTF();
-                data = clientSentence.split("-", 2);
-                if(data[0].equals("Roll")){
-                    roll = Integer.parseInt(data[1]);
-                    System.out.println("Jogador "+players[1]+" tirou "+roll+" nos dados!");
-                    scores[1] = scores[1] + roll;
-                    out.writeUTF("Adversario avancou " + roll + " casas!");
-                    if(scores[1] >= 10){
-                        end_game = true;
-                        System.out.println("Jogador "+players[1]+" venceu a corrida!");
-                        out.writeUTF("Fim de jogo");
-                        out2.writeUTF("Fim de jogo");
-                        out.writeUTF("Jogador "+players[1]+" venceu a corrida!");
-                        out2.writeUTF("Jogador "+players[1]+" venceu a corrida!");
-                        break;
-                    }
-                    switchCasos(board[scores[1]], out2, out);
-
-                    out2.writeUTF("-------------------------------");
-                    out2.writeUTF("Voce esta na casa: " + scores[1] );
-                    out2.writeUTF("-------------------------------");
-                    out2.writeUTF("Seu adversario esta na casa: " + scores[1] );
-                    out2.writeUTF("-------------------------------");
-
-                    out.writeUTF("-------------------------------");
-                    out.writeUTF("Voce esta na casa: " + scores[1] );
-                    out.writeUTF("-------------------------------");
-                    out.writeUTF("Seu adversario esta na casa: " + scores[0] );
-                    out.writeUTF("-------------------------------");
-
-
-
-                }
-                else{
-                    System.out.println(clientSentence);
-                }
-            }
+            rodadas(players, in, in2, out, out2);;
         } 
         catch (IOException e) {
             e.printStackTrace();

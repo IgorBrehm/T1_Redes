@@ -48,6 +48,12 @@ public class Client {
                         name = input.nextLine();
                         out.writeUTF("Name-"+name); 
                     }
+                    else if(serverSentence.equals("Nome invalido")){
+                        System.out.println("Nome Invalido! Tente novamente.");
+                        System.out.println("Digite seu nome:");
+                        name = input.nextLine();
+                        out.writeUTF("Name-"+name);
+                    }
                     if(serverSentence.equals("Iniciando jogo")){
                         System.out.println("\n"+serverSentence);
                         break;
@@ -93,6 +99,12 @@ public class Client {
                         flag = true;
                         break;   
                     }
+                    else if(serverSentence.equals("Desistencia")){
+                        System.out.println("Infelizmente, seu adversário desistiu do jogo.");
+                        System.out.println("Esperamos poder jogar com você novamente.");
+                        flag=true;
+                        break;
+                    }
                     else{
                         System.out.println(serverSentence);
                     }
@@ -115,8 +127,16 @@ public class Client {
                 System.out.println(serverSentence);
                 break;   
             }
+            else if(serverSentence.equals("Desistencia")){
+                System.out.println("Infelizmente, seu adversário desistiu do jogo.");
+                System.out.println("Esperamos poder jogar com você novamente.");
+                break;
+            }
             else {
                 System.out.println(serverSentence);
+            }
+            if(serverSentence.equals("Desistencia")){
+                break;
             }
         }
         client.close();
