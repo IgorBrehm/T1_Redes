@@ -89,30 +89,12 @@ public class Client {
                     while(true){
                         serverSentence = in.readUTF();
                         if(serverSentence.equals("Sua vez")){
-                            System.out.println("\n"+serverSentence);
-                            System.out.println("\nDigite 1 para jogar o dado, 2 para sair:");
-                            res = input.nextInt();
-                            if(res == 2){
-                                out.writeUTF("Exit-"+name);
-                                flag = true;
-                                break;   
-                            }
-                            roll = r.nextInt(5) + 1;
-                            System.out.println("\nAvancou " + roll + " casas!\n");
-                            out.writeUTF("Roll-"+roll);
                             break;
                         }
                         else if(serverSentence.equals("Fim de jogo")){
-                            serverSentence = in.readUTF();
-                            System.out.println(serverSentence);
-                            flag = true;
                             break;   
                         }
                         else if(serverSentence.equals("Desistencia")){
-                            System.out.println("Infelizmente, seu adversario desistiu do jogo.");
-                            System.out.println("Por conta disso, a partida sera encerrada.");
-                            System.out.println("Esperamos poder jogar com voce novamente.");
-                            flag=true;
                             break;
                         }
                         else{
@@ -120,7 +102,7 @@ public class Client {
                         }
                     }            
                 }
-                else if(serverSentence.equals("Sua vez")){
+                if(serverSentence.equals("Sua vez")){
                     System.out.println("\n"+serverSentence);
                     System.out.println("\nDigite 1 para jogar o dado, 2 para sair:");
                     res = input.nextInt();
@@ -131,13 +113,14 @@ public class Client {
                     roll = r.nextInt(5) + 1;
                     System.out.println("\nAvancou " + roll + " casas!\n");
                     out.writeUTF("Roll-"+roll);
+                    continue;
                 }
-                else if(serverSentence.equals("Fim de jogo")){
+                if(serverSentence.equals("Fim de jogo")){
                     serverSentence = in.readUTF();
                     System.out.println(serverSentence);
                     break;   
                 }
-                else if(serverSentence.equals("Desistencia")){
+                if(serverSentence.equals("Desistencia")){
                     System.out.println("Infelizmente, seu adversário desistiu do jogo.");
                     System.out.println("Por conta disso, a partida sera encerrada.");
                     System.out.println("Esperamos poder jogar com você novamente.");
@@ -155,6 +138,9 @@ public class Client {
     }
     
     //Metodo main do programa cliente com menu de interacao
+
+    //Para executar o lado do cliente, deve-se passar como parametro o IP e a Porta do servidor
+    //ex: java Client localhost 80 --> caso esteja rodando na mesma maquina e a porta do servidor seja 80
     public static void main(String [] args) {
         String name = args[0];
         int number = Integer.parseInt(args[1]);

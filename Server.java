@@ -12,7 +12,7 @@ public class Server extends Thread {
     private ServerSocket serverSocket;
     private static int[] scores;
     private static int[] board;
-    private static int board_size;
+    private int board_size;
 
     public Server(int port,int board_size) throws IOException {
         serverSocket = new ServerSocket(port);
@@ -53,6 +53,9 @@ public class Server extends Thread {
                 System.out.println("Jogador "+players[playerNumber]+" tirou "+roll+" nos dados!");
                 scores[playerNumber] = scores[playerNumber] + roll;
                 outEsperando.writeUTF("\nAdversario avancou " + roll + " casas!");
+                // Metodo que verifica o evento decorrente da casa onde o jogador parou
+                switchCasos(playerNumber+1,board[scores[playerNumber]], outJogando, outEsperando); 
+
                 if(scores[playerNumber] >= board_size){
                     System.out.println("Jogador "+players[playerNumber]+" venceu a corrida!");
                     outJogando.writeUTF("Fim de jogo");
@@ -61,9 +64,7 @@ public class Server extends Thread {
                     outEsperando.writeUTF("Jogador "+players[playerNumber]+" venceu a corrida!");
                     return false;
                 }
-                // Metodo que verifica o evento decorrente da casa onde o jogador parou
-                switchCasos(playerNumber+1,board[scores[playerNumber]], outJogando, outEsperando); 
-
+                
                 outJogando.writeUTF("-------------------------------");
                 outJogando.writeUTF("Voce esta na casa: " + scores[playerNumber] );
                 outJogando.writeUTF("-------------------------------");
@@ -310,6 +311,9 @@ public class Server extends Thread {
    }
     
     // Metodo main que inicia o programa servidor
+
+    //Para executar o lado do servidor, deve-se passar como parametro a porta que sera utilizada e o tamanho do tabuleiro
+    //ex: java Server 80 20 -> Onde a porta sera 80, e o tamanho do tabuleiro sera 20
     public static void main(String [] args) {
         int port = Integer.parseInt(args[0]);
         int board_size = Integer.parseInt(args[1]);
