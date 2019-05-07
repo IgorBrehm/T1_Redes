@@ -19,108 +19,78 @@ public class Server extends Thread {
         this.board_size = board_size;
     }
 
-    // Metodo que executa as rodadas de uma partida do jogo
+    // Metodo que controla as rodadas de uma partida do jogo
     public void rodadas(String[] players,DataInputStream in, DataInputStream in2, DataOutputStream out, DataOutputStream out2){
-        try{
+        while(true){
+            // ambos jogadores fazem suas jogadas, se o jogo terminou por algum motivo, finaliza as rodadas
+            if(!realizaAcao(0,players, out, out2, in)){
+                return;
+            }
+            if(!realizaAcao(1,players, out2, out, in2)){
+                return;
+            }
+
+        }
+    }
+
+    // Realiza a acao do jogador, 
+    // caso o jogo terminou porque alguem terminou a corrida ou desistiu retorna false
+    // caso o jogador simplesmente executou sua rodada, retorna true
+    public Boolean realizaAcao(int playerNumber,String[] players,DataOutputStream outJogando, DataOutputStream outEsperando, DataInputStream inJogando){
+        try {
+            int adversaryNumber;
+            if(playerNumber == 0) adversaryNumber = 1;
+            else adversaryNumber = 0;
+            String clientSentence;
             int roll = 0;
-            boolean end_game = false;
-            String clientSentence = "";
-
-            while(end_game == false){
-                // Vez do jogador identificado por out e in
-                out.writeUTF("Sua vez");
-                out2.writeUTF("Aguardando adversario");
-                clientSentence = in.readUTF();
-                String[] data = clientSentence.split("-", 2); // Pega a mensagem enviada pelo jogador
-                if(data[0].equals("Roll")){
-                    // Se o jogador rodou o dado deve apresentar o resultado para ambos jogadores e verificar se ele terminou a corrida
-                    roll = Integer.parseInt(data[1]);
-                    System.out.println("Jogador "+players[0]+" tirou "+roll+" nos dados!");
-                    scores[0] = scores[0] + roll;
-                    out2.writeUTF("\nAdversario avancou " + roll + " casas!");
-                    if(scores[0] >= board_size){
-                        end_game = true;
-                        System.out.println("Jogador "+players[0]+" venceu a corrida!");
-                        out.writeUTF("Fim de jogo");
-                        out2.writeUTF("Fim de jogo");
-                        out.writeUTF("Jogador "+players[0]+" venceu a corrida!");
-                        out2.writeUTF("Jogador "+players[0]+" venceu a corrida!");
-                        break;
-                    }
-                    switchCasos(1,board[scores[0]], out, out2); // Metodo que verifica o evento decorrente da casa onde o jogador parou
-
-                    out.writeUTF("-------------------------------");
-                    out.writeUTF("Voce esta na casa: " + scores[0] );
-                    out.writeUTF("-------------------------------");
-                    out.writeUTF("Seu adversario esta na casa: " + scores[1] );
-                    out.writeUTF("-------------------------------");
-
-                    out2.writeUTF("-------------------------------");
-                    out2.writeUTF("Voce esta na casa: " + scores[1] );
-                    out2.writeUTF("-------------------------------");
-                    out2.writeUTF("Seu adversario esta na casa: " + scores[0] );
-                    out2.writeUTF("-------------------------------");
-
+            outJogando.writeUTF("Sua vez"); // jogador que esta em sua rodada
+            outEsperando.writeUTF("Aguardando adversario"); // jogador que esta esperando pelo adversario
+            clientSentence = inJogando.readUTF();
+            String[] data = clientSentence.split("-", 2); // Pega a mensagem enviada pelo jogador
+            if(data[0].equals("Roll")){
+                // Se o jogador rodou o dado deve apresentar o resultado para ambos jogadores e verificar se ele terminou a corrida
+                roll = Integer.parseInt(data[1]);
+                System.out.println("Jogador "+players[playerNumber]+" tirou "+roll+" nos dados!");
+                scores[playerNumber] = scores[playerNumber] + roll;
+                outEsperando.writeUTF("\nAdversario avancou " + roll + " casas!");
+                if(scores[playerNumber] >= board_size){
+                    System.out.println("Jogador "+players[playerNumber]+" venceu a corrida!");
+                    outJogando.writeUTF("Fim de jogo");
+                    outEsperando.writeUTF("Fim de jogo");
+                    outJogando.writeUTF("Jogador "+players[playerNumber]+" venceu a corrida!");
+                    outEsperando.writeUTF("Jogador "+players[playerNumber]+" venceu a corrida!");
+                    return false;
                 }
-                else if(data[0].equals("Exit")){ // Verifica se o jogador desistiu do jogo
-                    out2.writeUTF("Desistencia"); // Avisa o outro jogador da desistencia de seu adversario
-                    System.out.println("Jogador "+data[1]+" desistiu da partida.");
-                    System.out.println("Esperando proximos jogadores");
-                    return;
-                }
-                else{
-                    System.out.println(clientSentence);
-                }
-                // Vez do outro jogador, identificado por out2 e in2
-                out.writeUTF("Aguardando adversario");
-                out2.writeUTF("Sua vez");
-                clientSentence = in2.readUTF();
-                data = clientSentence.split("-", 2); 
-                if(data[0].equals("Roll")){
-                    roll = Integer.parseInt(data[1]);
-                    System.out.println("Jogador "+players[1]+" tirou "+roll+" nos dados!");
-                    scores[1] = scores[1] + roll;
-                    out.writeUTF("\nAdversario avancou " + roll + " casas!");
-                    if(scores[1] >= board_size){
-                        end_game = true;
-                        System.out.println("Jogador "+players[1]+" venceu a corrida!");
-                        out.writeUTF("Fim de jogo");
-                        out2.writeUTF("Fim de jogo");
-                        out.writeUTF("Jogador "+players[1]+" venceu a corrida!");
-                        out2.writeUTF("Jogador "+players[1]+" venceu a corrida!");
-                        break;
-                    }
-                    switchCasos(2,board[scores[1]], out2, out);
+                // Metodo que verifica o evento decorrente da casa onde o jogador parou
+                switchCasos(playerNumber+1,board[scores[playerNumber]], outJogando, outEsperando); 
 
-                    out2.writeUTF("-------------------------------");
-                    out2.writeUTF("Voce esta na casa: " + scores[1] );
-                    out2.writeUTF("-------------------------------");
-                    out2.writeUTF("Seu adversario esta na casa: " + scores[0] );
-                    out2.writeUTF("-------------------------------");
+                outJogando.writeUTF("-------------------------------");
+                outJogando.writeUTF("Voce esta na casa: " + scores[playerNumber] );
+                outJogando.writeUTF("-------------------------------");
+                outJogando.writeUTF("Seu adversario esta na casa: " + scores[adversaryNumber] );
+                outJogando.writeUTF("-------------------------------");
 
-                    out.writeUTF("-------------------------------");
-                    out.writeUTF("Voce esta na casa: " + scores[0] );
-                    out.writeUTF("-------------------------------");
-                    out.writeUTF("Seu adversario esta na casa: " + scores[1] );
-                    out.writeUTF("-------------------------------");
+                outEsperando.writeUTF("-------------------------------");
+                outEsperando.writeUTF("Voce esta na casa: " + scores[adversaryNumber] );
+                outEsperando.writeUTF("-------------------------------");
+                outEsperando.writeUTF("Seu adversario esta na casa: " + scores[playerNumber] );
+                outEsperando.writeUTF("-------------------------------");
 
-
-
-                }
-                else if(data[0].equals("Exit")){
-                    out.writeUTF("Desistencia");
-                    System.out.println("Jogador "+data[1]+" desistiu da partida.");
-                    System.out.println("Esperando próximos jogadores.");
-                    return;
-                }
-                else{
-                    System.out.println(clientSentence);
-                }
+            }
+            else if(data[0].equals("Exit")){ // Verifica se o jogador desistiu do jogo
+                outEsperando.writeUTF("Desistencia"); // Avisa o outro jogador da desistencia de seu adversario
+                System.out.println("Jogador "+data[1]+" desistiu da partida.");
+                System.out.println("Esperando proximos jogadores");
+                return false;
+            }
+            else{
+                System.out.println(clientSentence);
             }
         }
         catch (IOException e) {
             e.printStackTrace();
         }
+        return true;
     }
 
     //Metodo que inicializa as coneccoes com os jogadores e organiza o inicio da partida
